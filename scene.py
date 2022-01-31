@@ -1,9 +1,9 @@
+import imp
 from constants import *
 import pygame
 import pygame.draw
 from track import Track
-
-print(SCREEN_SIZE)
+from vehicule import Vehicule, SetOfVehicules
 
 class Scene:
     _track= None
@@ -21,7 +21,7 @@ class Scene:
         #self._font = pygame.font.SysFont('Arial', 25)
 
     def drawMe(self):
-        self._screen.fill((102, 153, 0))
+        self._screen.fill((0,0,0))
         self._track.drawMe(scene = self)
         self._vehicules.drawMe(self._screen, scene = self)
 
@@ -46,5 +46,6 @@ class Scene:
     def eventClic(self,coord,b):
         print("Adding Vehicule at ",coord[0],",",coord[1])
         self._vehicules.append(Vehicule((coord[0],coord[1])))
+        
     def recordMouseMove(self, coord):
         self._mouseCoords = coord
