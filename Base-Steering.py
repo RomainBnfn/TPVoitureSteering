@@ -1,13 +1,9 @@
 import sys, math
 import pygame
 import pygame.draw
-import random
-import time
-from threading import Thread, current_thread
 
-rd = random.Random()
-__circuit__ = ((50,50),(550,50),(550,550),(50, 550))
-__screenSize__ = (600,600)
+__circuit__ = ((10,10),(20,20),(35,70),(600, 380),(550,40))
+__screenSize__ = (640,480)
 
 # Utility functions for handling points
 # I should probably build a class of vectors
@@ -35,28 +31,15 @@ class Vehicule:
     _maxspeed = 20 
     _force = (0,0)  # accelerating force
     _maxforce = 10
+    _color = (200,100,100)
+    _colorfg = tuple([int(c/2) for c in _color])
+    _radius = 6
     _seeInFuture = 3
 
     def __init__(self, coords=(0,0), speed=(1,1), force =(1,1)):
-        self.setRandomColor()
-        self._colorfg = tuple([int(c / 2) for c in self._color])
-        self._radius = rd.randint(6, 30)
         self._coords = coords
         self._speed = speed
         self._force = force
-        t = Thread(target=self.threadRandomColor)
-        t.run()
-
-    def setRandomColor(self):
-        r = rd.randint(0, 255)
-        g = rd.randint(0, 255)
-        b = rd.randint(0, 255)
-        self._color = (r, g, b)
-
-    def threadRandomColor(self):
-        while True:
-            self.setRandomColor()
-            time.sleep(500)
 
     def position(self): return self._pos
 
@@ -82,8 +65,8 @@ class Vehicule:
 
 
     def drawMe(self, screen):
-        pygame.draw.circle(screen,self._color,   self._coords,self._radius,0)
-        pygame.draw.circle(screen,self._colorfg, self._coords,self._radius,1)
+        pygame.draw.circle(screen,self._color,   self._coords,Vehicule._radius,0)
+        pygame.draw.circle(screen,self._colorfg, self._coords,Vehicule._radius,1)
 
 
 class SetOfVehicules:
@@ -97,10 +80,7 @@ class SetOfVehicules:
                 al = approximateLength(offset)
                 if al != 0 and al < v1._radius + v2._radius - 1: # collision
                         v1._coords=(int(v1._coords[0]+offset[0]/al*(v1._radius+v2._radius)),
-                                    int(v1._coords[1]+offset[1]/al*(v1._radius+v2._radius)))
-
-                        v2._coords = (int(v2._coords[0] - offset[0] / al * (v2._radius + v1._radius)),
-                              int(v2._coords[1] - offset[1] / al * (v2._radius + v2._radius)))
+                                    int(v2._coords[1]+offset[1]/al*(v1._radius+v2._radius)))
 
     def updatePositions(self):
         for v in self._vehicules:
@@ -119,9 +99,9 @@ class SetOfVehicules:
 
 class Track:
     _circuit = None
-    _cback = (0,0,0)
+    _cback = (128,128,128)
     _cfore = (10,10,10)
-    _width = 50
+    _width = 30
     _screen = None
     _cachedLength = []
     _cachedNormals = []
@@ -180,10 +160,8 @@ class Track:
 
         for p in self._circuit: # Draw simple inner joins
             pygame.draw.circle(self._screen,self._cback,p,int(self._width/2),0)
-
         pygame.draw.lines(self._screen, self._cback, True, self._circuit, self._width)
-        #
-        pygame.draw.lines(self._screen, (255, 255, 255), True, self._circuit, 1)
+        pygame.draw.lines(self._screen, self._cfore, True, self._circuit, 1)
 
         if True:
             for i,p in enumerate(self._circuit):
@@ -209,7 +187,7 @@ class Scene:
         #self._font = pygame.font.SysFont('Arial', 25)
 
     def drawMe(self):
-        self._screen.fill((102, 153, 0))
+        self._screen.fill((0,0,0))
         self._track.drawMe(scene = self)
         self._vehicules.drawMe(self._screen, scene = self)
 
