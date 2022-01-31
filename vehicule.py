@@ -36,22 +36,29 @@ class Vehicule:
     def steerUpdate(self, track, vehicules):
         self._force = (0,0)
         self._force = Vector.add(self._force, self.steerPathFollow(track))
-        #steerSeparation(self, vehicules)
+        self.steerSeparation(vehicules)
 
     def steerPathFollow(self, track):
         (s,p,l) = track._closestSegmentPointToPoint(self._coords)
-        # TODO: We should first add a force if l is too large (too far from the middle of the track) 
-        # This is the future position
-        (sf, futurePosition) = track._segmentPointAddLength(s, p, max(10,Vector.approximateLength(self._speed)) * self._seeInFuture) 
+        init_force = (0, 0)
+        if l > ROAD_SIZE/2 :
+            # Too far from the middle of the track
+            init_force = Vector.diff(p, self._coords)
+            # Out of the road --> Addapt the road
+            track.out_position(self._coords)
+        (sf, futurePosition) = track._segmentPointAddLength(s, p, max(10, Vector.approximateLength(self._speed)) * self._seeInFuture) 
         # We just have to register a force to get to futurePosition !
         force = Vector.diff(futurePosition, self._coords)
-        force = Vector.scalarMult(force,self._maxforce/Vector.approximateLength(force))
+        #force = Vector.add(force, init_force)
+        force = Vector.scalarMult( force, 
+                                self._maxforce / Vector.approximateLength(force) if Vector.approximateLength(force) > 0.5 else self._maxforce )
         return force
 
     def steerSeparation(self, vehicules):
         forceAccu = (0,0) # starts with a fresh force
-        # for v in vehicules:
-        #     if v is not self:
+        for i, v in enumerate(vehicules._vehicules):
+            if v is not self:
+                pass
 
 
     def drawMe(self, screen):

@@ -4,12 +4,11 @@ import pygame
 
 class Track:
     _circuit = None
-    _cback = (128,128,128)
-    _cfore = (10,10,10)
     _width = 30
     _screen = None
     _cachedLength = []
     _cachedNormals = []
+    _out_points = []
 
     def __init__(self, screen, circuit = CIRCUIT):
         self._circuit = circuit
@@ -62,12 +61,24 @@ class Track:
         if projection > self._cachedLength[numSegment]:
             return p1
         return Vector.add(p0,Vector.scalarMult(self._cachedNormals[numSegment], projection))
+    
+    def out_position(self, coords):
+        # When a vehicules cross the road
+        canAdd = True
+        for p in self._out_points:
+            if Vector.approximateDistance(coords, p) < 8:
+                canAdd = False
+                break
+        if canAdd:
+            self._out_points.append(coords)
 
     def drawMe(self, scene = None):
         for p in self._circuit: # Draw simple inner joins
-            pygame.draw.circle(self._screen,self._cback,p,int(self._width/2),0)
-        pygame.draw.lines(self._screen, self._cback, True, self._circuit, self._width)
-        pygame.draw.lines(self._screen, self._cfore, True, self._circuit, 1)
+            pygame.draw.circle(self._screen, ROAD_COLOR ,p,int(self._width/2),0)
+        for p in self._out_points:
+            pygame.draw.circle(self._screen, ROAD_COLOR ,p,int(self._width/2),0)
+        pygame.draw.lines(self._screen, ROAD_COLOR , True, self._circuit, self._width)
+        pygame.draw.lines(self._screen, LINE_COLOR , True, self._circuit, 1)
 
         if True:
             for i,p in enumerate(self._circuit):

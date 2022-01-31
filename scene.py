@@ -10,7 +10,6 @@ class Scene:
     _vehicules = None
     _screen = None
     _font = None
-
     _mouseCoords = (0,0)
 
     def __init__(self, screenSize = SCREEN_SIZE):
@@ -21,7 +20,7 @@ class Scene:
         #self._font = pygame.font.SysFont('Arial', 25)
 
     def drawMe(self):
-        self._screen.fill((0,0,0))
+        self._screen.fill(BACKGROUND_COLOR)
         self._track.drawMe(scene = self)
         self._vehicules.drawMe(self._screen, scene = self)
 
